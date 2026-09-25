@@ -1,6 +1,6 @@
 from bpy.types import Panel
 
-from ..utils.ui import get_node_or_input, get_node_prop_path
+from ..utils.ui import get_node_or_input, get_node_prop_path, prop
 
 
 class RetouchPanelMixin:
@@ -8,10 +8,6 @@ class RetouchPanelMixin:
     bl_region_type = "UI"
     bl_context = ""
     bl_category = "BLENDER RETOUCH"
-
-    def draw_prop(self, layout, data, prop, text=""):
-        if data is not None:
-            layout.prop(data, prop, text=text)
 
 
 class RETOUCH_PT_main(RetouchPanelMixin, Panel):
@@ -41,12 +37,12 @@ class RETOUCH_PT_light(RetouchPanelMixin, Panel):
 
     def draw(self, context):
         layout = self.layout
-        self.draw_prop(layout, get_node_or_input(context, "Exposure", 1), "default_value", "Exposure")
-        self.draw_prop(layout, get_node_or_input(context, "Brightness/Contrast", 2), "default_value", "Contrast")
-        self.draw_prop(layout, get_node_or_input(context, "Color Correction", 10), "default_value", "Highlight")
-        self.draw_prop(layout, get_node_or_input(context, "Color Correction", 20), "default_value", "Shadow")
-        self.draw_prop(layout, get_node_or_input(context, "Color Correction", 9), "default_value", "White Level")
-        self.draw_prop(layout, get_node_or_input(context, "Color Correction", 19), "default_value", "Black Level")
+        prop(layout, context, "Exposure", 1, "Exposure")
+        prop(layout, context, "Brightness/Contrast", 2, "Contrast")
+        prop(layout, context, "Color Correction", 10, "Highlight")
+        prop(layout, context, "Color Correction", 20, "Shadow")
+        prop(layout, context, "Color Correction", 9, "White Level")
+        prop(layout, context, "Color Correction", 19, "Black Level")
 
 
 class RETOUCH_PT_lift_gamma_gain(RetouchPanelMixin, Panel):
@@ -58,9 +54,9 @@ class RETOUCH_PT_lift_gamma_gain(RetouchPanelMixin, Panel):
 
     def draw(self, context):
         layout = self.layout
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance", 3), "default_value", "Lift")
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance", 5), "default_value", "Gamma")
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance", 7), "default_value", "Gain")
+        prop(layout, context, "Color Balance", 3, "Lift")
+        prop(layout, context, "Color Balance", 5, "Gamma")
+        prop(layout, context, "Color Balance", 7, "Gain")
 
 
 class RETOUCH_PT_curves(RetouchPanelMixin, Panel):
@@ -74,7 +70,7 @@ class RETOUCH_PT_curves(RetouchPanelMixin, Panel):
         layout = self.layout
         if curves_node := get_node_or_input(context, "RGB Curves"):
             layout.template_curve_mapping(curves_node, "mapping", type="COLOR", show_tone=True)
-        self.draw_prop(layout, get_node_or_input(context, "RGB Curves", 1), "default_value", "Factor")
+        prop(layout, context, "RGB Curves", 1, "Factor")
 
 
 class RETOUCH_PT_color(RetouchPanelMixin, Panel):
@@ -85,17 +81,17 @@ class RETOUCH_PT_color(RetouchPanelMixin, Panel):
 
     def draw(self, context):
         layout = self.layout
-        self.draw_prop(layout, get_node_or_input(context, "Switch", 0), "default_value", "Monochrome")
+        prop(layout, context, "Switch", 0, "Monochrome")
 
         if wb_node := get_node_or_input(context, "Color Balance.001"):
             row = layout.row(align=True)
             row.label(text="White Balance")
             row.operator("ui.eyedropper_color", text="", icon="EYEDROPPER").prop_data_path = get_node_prop_path(context, wb_node, "input_whitepoint")
 
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance.001", 15), "default_value", "Temperature")
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance.001", 16), "default_value", "Tint")
-        self.draw_prop(layout, get_node_or_input(context, "BR_Color", 1), "default_value", "Saturation")
-        self.draw_prop(layout, get_node_or_input(context, "BR_Color", 2), "default_value", "Natural Saturation")
+        prop(layout, context, "Color Balance.001", 15, "Temperature")
+        prop(layout, context, "Color Balance.001", 16, "Tint")
+        prop(layout, context, "BR_Color", 1, "Saturation")
+        prop(layout, context, "BR_Color", 2, "Natural Saturation")
 
 
 class RETOUCH_PT_hue_correct(RetouchPanelMixin, Panel):
@@ -119,11 +115,11 @@ class RETOUCH_PT_color_balance(RetouchPanelMixin, Panel):
 
     def draw(self, context):
         layout = self.layout
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance.002", 4), "default_value", "Lift")
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance.002", 6), "default_value", "Gamma")
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance.002", 8), "default_value", "Gain")
-        self.draw_prop(layout, get_node_or_input(context, "Mix", 7), "default_value", "Offset")
-        self.draw_prop(layout, get_node_or_input(context, "Color Balance.002", 1), "default_value", "Strength")
+        prop(layout, context, "Color Balance.002", 4, "Lift")
+        prop(layout, context, "Color Balance.002", 6, "Gamma")
+        prop(layout, context, "Color Balance.002", 8, "Gain")
+        prop(layout, context, "Mix", 7, "Offset")
+        prop(layout, context, "Color Balance.002", 1, "Strength")
 
 
 class RETOUCH_PT_effect(RetouchPanelMixin, Panel):
@@ -143,34 +139,34 @@ class RETOUCH_PT_effect(RetouchPanelMixin, Panel):
         tabs = retouch.panel_tabs
 
         if tabs == "Effects":
-            self.draw_prop(layout, get_node_or_input(context, "BR_Effect", 1), "default_value", "Texture")
-            self.draw_prop(layout, get_node_or_input(context, "BR_Effect", 2), "default_value", "Clarity")
+            prop(layout, context, "BR_Effect", 1, "Texture")
+            prop(layout, context, "BR_Effect", 2, "Clarity")
         elif tabs == "Vignette":
-            self.draw_prop(col, get_node_or_input(context, "Vignette", 1), "default_value", "Strength")
-            self.draw_prop(col, get_node_or_input(context, "Vignette", 2), "default_value", "Feather")
-            self.draw_prop(col, get_node_or_input(context, "Vignette", 3), "default_value", "Corner Roundness")
-            self.draw_prop(col, get_node_or_input(context, "Vignette", 4), "default_value", "Scale")
+            prop(col, context, "Vignette", 1, "Strength")
+            prop(col, context, "Vignette", 2, "Feather")
+            prop(col, context, "Vignette", 3, "Corner Roundness")
+            prop(col, context, "Vignette", 4, "Scale")
         elif tabs == "Grain":
-            self.draw_prop(layout, get_node_or_input(context, "Film Grain", 1), "default_value", "Strength")
-            self.draw_prop(layout, get_node_or_input(context, "Film Grain", 2), "default_value", "")
+            prop(layout, context, "Film Grain", 1, "Strength")
+            prop(layout, context, "Film Grain", 2, "")
 
             type_socket = get_node_or_input(context, "Film Grain", 2)
             if type_socket is not None and type_socket.default_value == "Custom":
                 layout.prop(get_node_or_input(context, "Film Grain", 3), "default_value", text="Scale", expand=True)
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 4), "default_value", "Style")
+                prop(layout, context, "Film Grain", 4, "Style")
 
-            self.draw_prop(layout, get_node_or_input(context, "Film Grain", 5), "default_value", "Animated")
+            prop(layout, context, "Film Grain", 5, "Animated")
 
             custom_socket = get_node_or_input(context, "Film Grain", 4)
             if custom_socket is not None and custom_socket.default_value == "Custom Style" and type_socket.default_value == "Custom":
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 6), "default_value", "ISO")
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 7), "default_value", "Softness")
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 8), "default_value", "Acutance")
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 9), "default_value", "Coarseness")
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 10), "default_value", "Patchiness")
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 11), "default_value", "Saturation")
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 12), "default_value", "Luma bias")
-                self.draw_prop(layout, get_node_or_input(context, "Film Grain", 13), "default_value", "Texture Scale")
+                prop(layout, context, "Film Grain", 6, "ISO")
+                prop(layout, context, "Film Grain", 7, "Softness")
+                prop(layout, context, "Film Grain", 8, "Acutance")
+                prop(layout, context, "Film Grain", 9, "Coarseness")
+                prop(layout, context, "Film Grain", 10, "Patchiness")
+                prop(layout, context, "Film Grain", 11, "Saturation")
+                prop(layout, context, "Film Grain", 12, "Luma bias")
+                prop(layout, context, "Film Grain", 13, "Texture Scale")
 
 
 classes = (

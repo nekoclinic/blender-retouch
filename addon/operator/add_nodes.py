@@ -19,9 +19,10 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
     bl_idname = "retouch.add_nodes"
     bl_label = "Load Image"
     bl_description = "Add nodes"
+    bl_options = {'REGISTER', 'UNDO'}
 
     filter_glob: StringProperty(
-        default="*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.bmp;*.exr",
+        default="*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.bmp;*.exr*;*.hdr;*.tga;*.dng",
         options={"HIDDEN"},
         maxlen=255,
     )
@@ -38,6 +39,7 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
             self.report({"ERROR"}, "No image selected.")
             return {"CANCELLED"}
 
+        # 「画像のみ」では新規ノードツリーを作り、それ以外では同梱テンプレートを適用します。
         if context.scene.retouch_image_only:
             try:
                 image = bpy.data.images.load(self.filepath, check_existing=True)
@@ -69,6 +71,7 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
             return {"CANCELLED"}
 
         try:
+            # GPU が利用できない環境では、既定のデバイス設定をそのまま使用します。
             scene.render.compositor_device = "GPU"
         except (AttributeError, TypeError):
             pass

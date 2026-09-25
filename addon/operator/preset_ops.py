@@ -84,6 +84,7 @@ class RETOUCH_OT_load_preset(Operator):
 
         preset_version = payload.get("version")
         version_warning = None
+        # 古い形式を即座に拒否せず、復元可能な場合は警告付きで読み込みます。
         if preset_version is not None and not is_valid_preset_version(preset_version):
             version_warning = f"preset version {preset_version!r} is invalid or unrecognized"
         elif preset_version is not None and not is_version_supported(preset_version):
@@ -289,6 +290,7 @@ class RETOUCH_OT_rename_preset(Operator):
             return {"CANCELLED"}
 
         try:
+            # 正常なプリセットは内容を更新して保存し直し、読めない場合はバイナリをそのまま移動します。
             payload = load_preset_file(source_path)
             if payload is not None and isinstance(payload, dict):
                 payload["name"] = new_base_name
@@ -395,6 +397,7 @@ class RETOUCH_OT_export_preset(Operator, ExportHelper):
             return {"CANCELLED"}
 
         filepath = self.filepath
+        # 拡張子を省略しても .brp として保存できるように補います。
         if not filepath.lower().endswith(get_preset_extension()):
             filepath = f"{filepath}{get_preset_extension()}"
 
@@ -435,6 +438,7 @@ class RETOUCH_OT_import_preset(Operator, ImportHelper):
             self.report({"ERROR"}, "Preset name is empty.")
             return {"CANCELLED"}
 
+        # ファイル名をプリセット名として採用し、現在開いているフォルダーへ保存します。
         payload["name"] = preset_name
 
         retouch_props = getattr(context.scene, "retouch", None)
