@@ -35,6 +35,9 @@ class RETOUCH_PT_light(RetouchPanelMixin, Panel):
     bl_parent_id = RETOUCH_PT_main.bl_idname
     bl_order = 1
 
+    def draw_header(self, context):
+        self.layout.label(text="", icon="OUTLINER_DATA_LIGHT")
+
     def draw_header_preset(self, context):
         nodes_toggle(self.layout, context, ("Exposure", "Brightness/Contrast", "Color Correction"))
 
@@ -87,6 +90,9 @@ class RETOUCH_PT_color(RetouchPanelMixin, Panel):
     bl_label = "Color"
     bl_parent_id = RETOUCH_PT_main.bl_idname
     bl_order = 4
+
+    def draw_header(self, context):
+        self.layout.label(text="", icon="SHADING_RENDERED")
 
     def draw_header_preset(self, context):
         nodes_toggle(self.layout, context, ("Color Balance.001", "BR_Color", "Switch"))
@@ -145,6 +151,9 @@ class RETOUCH_PT_effect(RetouchPanelMixin, Panel):
     bl_label = "Effect"
     bl_parent_id = RETOUCH_PT_main.bl_idname
     bl_order = 7
+
+    def draw_header(self, context):
+        self.layout.label(text="", icon="RENDER_RESULT")
 
     def draw_header_preset(self, context):
         nodes_toggle(self.layout, context, ("BR_Effect", "Vignette", "Film Grain"))

@@ -142,3 +142,4 @@ class RETOUCH_PT_preset(RetouchPanelMixin, Panel):
 classes = (
     RETOUCH_PT_preset,
 )
+
