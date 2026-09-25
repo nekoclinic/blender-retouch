@@ -1,6 +1,6 @@
 from bpy.types import Panel
 
-from ..utils.ui import get_node_or_input, get_node_prop_path, prop
+from ..utils.ui import nodes_toggle, get_node_or_input, get_node_prop_path, prop
 
 
 class RetouchPanelMixin:
@@ -35,6 +35,9 @@ class RETOUCH_PT_light(RetouchPanelMixin, Panel):
     bl_parent_id = RETOUCH_PT_main.bl_idname
     bl_order = 1
 
+    def draw_header_preset(self, context):
+        nodes_toggle(self.layout, context, ("Exposure", "Brightness/Contrast", "Color Correction"))
+
     def draw(self, context):
         layout = self.layout
         prop(layout, context, "Exposure", 1, "Exposure")
@@ -52,6 +55,9 @@ class RETOUCH_PT_lift_gamma_gain(RetouchPanelMixin, Panel):
     bl_order = 2
     bl_options = {"DEFAULT_CLOSED"}
 
+    def draw_header_preset(self, context):
+        nodes_toggle(self.layout, context, ("Color Balance",))
+
     def draw(self, context):
         layout = self.layout
         prop(layout, context, "Color Balance", 3, "Lift")
@@ -66,6 +72,9 @@ class RETOUCH_PT_curves(RetouchPanelMixin, Panel):
     bl_order = 3
     bl_options = {"DEFAULT_CLOSED"}
 
+    def draw_header_preset(self, context):
+        nodes_toggle(self.layout, context, ("RGB Curves",))
+
     def draw(self, context):
         layout = self.layout
         if curves_node := get_node_or_input(context, "RGB Curves"):
@@ -78,6 +87,9 @@ class RETOUCH_PT_color(RetouchPanelMixin, Panel):
     bl_label = "Color"
     bl_parent_id = RETOUCH_PT_main.bl_idname
     bl_order = 4
+
+    def draw_header_preset(self, context):
+        nodes_toggle(self.layout, context, ("Color Balance.001", "BR_Color", "Switch"))
 
     def draw(self, context):
         layout = self.layout
@@ -101,6 +113,9 @@ class RETOUCH_PT_hue_correct(RetouchPanelMixin, Panel):
     bl_order = 5
     bl_options = {"DEFAULT_CLOSED"}
 
+    def draw_header_preset(self, context):
+        nodes_toggle(self.layout, context, ("Hue Correct",))
+
     def draw(self, context):
         if curves_node := get_node_or_input(context, "Hue Correct"):
             self.layout.template_curve_mapping(curves_node, "mapping", type="HUE")
@@ -112,6 +127,9 @@ class RETOUCH_PT_color_balance(RetouchPanelMixin, Panel):
     bl_parent_id = RETOUCH_PT_color.bl_idname
     bl_order = 6
     bl_options = {"DEFAULT_CLOSED"}
+
+    def draw_header_preset(self, context):
+        nodes_toggle(self.layout, context, ("Hue Correct",))
 
     def draw(self, context):
         layout = self.layout
@@ -127,6 +145,9 @@ class RETOUCH_PT_effect(RetouchPanelMixin, Panel):
     bl_label = "Effect"
     bl_parent_id = RETOUCH_PT_main.bl_idname
     bl_order = 7
+
+    def draw_header_preset(self, context):
+        nodes_toggle(self.layout, context, ("BR_Effect", "Vignette", "Film Grain"))
 
     def draw(self, context):
         layout = self.layout

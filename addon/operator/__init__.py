@@ -1,11 +1,12 @@
 import bpy
 
-from . import add_nodes, preset_ops, template
+from . import add_nodes, preset_ops, template, toggle_nodes
 
 classes = []
 classes += add_nodes.classes
 classes += preset_ops.classes
 classes += template.classes
+classes += toggle_nodes.classes
 
 
 def register():

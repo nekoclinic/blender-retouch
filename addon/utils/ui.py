@@ -1,9 +1,29 @@
 from .compositor import NODETREE_NAME
 
+
+def get_nodes(context, node_names):
+    return [
+        node
+        for name in node_names
+        if (node := get_node_or_input(context, name)) is not None
+    ]
+
+
+def nodes_toggle(layout, context, node_names, inline=False):
+    nodes = get_nodes(context, node_names)
+    if not nodes:
+        return
+
+    icon = "HIDE_OFF" if not nodes[0].mute else "HIDE_ON"
+    row = layout if inline else layout.row(align=True)
+    operator = row.operator("retouch.toggle_nodes", text="", icon=icon, emboss=False)
+    operator.node_names = ",".join(node_names)
+
+
 def prop(layout, context, node_name, idx, label, text_prop="default_value"):
-        data = get_node_or_input(context, node_name, idx)
-        if data is not None:
-            layout.prop(data, text_prop, text=label)
+    data = get_node_or_input(context, node_name, idx)
+    if data is not None:
+        layout.prop(data, text_prop, text=label)
 
 
 def get_compositor_tree(context):

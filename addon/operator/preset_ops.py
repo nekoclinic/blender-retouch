@@ -65,6 +65,7 @@ class RETOUCH_OT_load_preset(Operator):
     bl_idname = "retouch.load_preset"
     bl_label = "Load Preset"
     bl_description = "Load a saved compositor preset"
+    bl_options = {'REGISTER', 'UNDO'}
 
     preset_name: StringProperty(name="Preset Name", default="")
 
