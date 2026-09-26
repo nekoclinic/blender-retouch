@@ -1,6 +1,5 @@
 from bpy.types import Panel
 
-
 from .ui_panel import RetouchPanelMixin
 
 
