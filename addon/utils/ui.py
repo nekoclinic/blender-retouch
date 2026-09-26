@@ -14,7 +14,7 @@ def nodes_toggle(layout, context, node_names, inline=False):
     if not nodes:
         return
 
-    icon = "HIDE_OFF" if not nodes[0].mute else "HIDE_ON"
+    icon = "HIDE_OFF" if all(not node.mute for node in nodes) else "HIDE_ON"
     row = layout if inline else layout.row(align=True)
     operator = row.operator("retouch.toggle_nodes", text="", icon=icon, emboss=False)
     operator.node_names = ",".join(node_names)

@@ -171,7 +171,7 @@ def _select_node(node_tree: bpy.types.NodeTree, node_name: str) -> bpy.types.Nod
 
 
 def _focus_compositor_group(context: bpy.types.Context, group_tree: bpy.types.NodeTree) -> None:
-    # 既存のノードエディターが開いている場合も、追加したグループをすぐ確認できる状態にします。
+    # ピン留めされていない既存のノードエディターでは、追加したグループをすぐ確認できる状態にします。
     scene = context.scene
     _assign_compositing_group(scene, group_tree)
     _select_node(group_tree, "Image")

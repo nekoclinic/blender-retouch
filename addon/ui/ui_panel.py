@@ -135,7 +135,7 @@ class RETOUCH_PT_color_balance(RetouchPanelMixin, Panel):
     bl_options = {"DEFAULT_CLOSED"}
 
     def draw_header_preset(self, context):
-        nodes_toggle(self.layout, context, ("Hue Correct",))
+        nodes_toggle(self.layout, context, ("Color Balance.002", "Mix"))
 
     def draw(self, context):
         layout = self.layout

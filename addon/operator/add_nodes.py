@@ -19,7 +19,7 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
     bl_idname = "retouch.add_nodes"
     bl_label = "Load Image"
     bl_description = "Add nodes"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
     filter_glob: StringProperty(
         default="*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.bmp;*.exr*;*.hdr;*.tga;*.dng",
@@ -69,13 +69,6 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
         scene = apply_retouch_to_scene(self, context, self.filepath, blend_file_path, NODETREE_NAME)
         if scene is None:
             return {"CANCELLED"}
-
-        try:
-            # GPU が利用できない環境では、既定のデバイス設定をそのまま使用します。
-            scene.render.compositor_device = "GPU"
-        except (AttributeError, TypeError):
-            pass
-
         return {"FINISHED"}
 
 
