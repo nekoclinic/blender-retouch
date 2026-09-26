@@ -8,4 +8,5 @@ def register():
 
 def unregister():
     pass
+#     アプリケーションテンプレートを削除する場合は以下を実行します。
 #     template.uninstall_app_template()

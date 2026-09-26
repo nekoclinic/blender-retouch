@@ -6,6 +6,8 @@ NODETREE_NAME = "BlenderRetouch_Nodes"
 
 
 def create_compositor_nodes(scene: bpy.types.Scene) -> bpy.types.NodeTree:
+    # Blender 5.x ではコンポジターを scene のノードグループとして保持し、
+    # render.use_compositing を有効にしないとノードが実行されません。
     tree = bpy.data.node_groups.new("Compositor Nodes", "CompositorNodeTree")
     scene.compositing_node_group = tree
     scene.render.use_compositing = True
@@ -64,6 +66,8 @@ def connect_to_outputs(
     group_out_location: tuple[float, float] = (500, 200),
     viewer_location: tuple[float, float] = (500, 0),
 ) -> None:
+    # 出力先が未作成のファイルにも対応するため、グループ出力とビューアーを補います。
+    # link_if_missing() により、この処理を複数回呼んでもリンクが重複しません。
     group_out = next((n for n in node_tree.nodes if n.type == "GROUP_OUTPUT"), None)
     if group_out is None:
         group_out = node_tree.nodes.new(type="NodeGroupOutput")
@@ -100,6 +104,7 @@ def get_image_from_active_or_linked(node_tree: bpy.types.NodeTree | None) -> bpy
     if not node_tree:
         return None
 
+    # 明示的な選択を優先し、見つからない場合だけ出力への接続と全ノードを調べます。
     active = node_tree.nodes.active
     if active and active.type == "IMAGE" and active.image:
         return active.image
@@ -122,6 +127,8 @@ def get_image_from_active_or_linked(node_tree: bpy.types.NodeTree | None) -> bpy
 
 
 def _pick_appended_group(nodetree_name: str, before_names: set[str]) -> bpy.types.NodeTree | None:
+    # append 後は Blender が同名データに .001 などの接尾辞を付けるため、
+    # append 前の一覧との差分から今回追加されたグループだけを候補にします。
     current_names = set(bpy.data.node_groups.keys())
     new_names = current_names - before_names
 
@@ -164,6 +171,7 @@ def _select_node(node_tree: bpy.types.NodeTree, node_name: str) -> bpy.types.Nod
 
 
 def _focus_compositor_group(context: bpy.types.Context, group_tree: bpy.types.NodeTree) -> None:
+    # ピン留めされていない既存のノードエディターでは、追加したグループをすぐ確認できる状態にします。
     scene = context.scene
     _assign_compositing_group(scene, group_tree)
     _select_node(group_tree, "Image")
@@ -267,6 +275,7 @@ def apply_retouch_to_scene(
     blend_file_path: str,
     nodetree_name: str = NODETREE_NAME,
 ) -> bpy.types.Scene | None:
+    # テンプレートの読み込み、画像の差し替え、表示中エディターの切り替えを一つの流れで行います。
     scene = context.scene
     if scene is None:
         operator.report({"ERROR"}, "No active scene found.")

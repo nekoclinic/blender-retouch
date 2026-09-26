@@ -7,12 +7,10 @@ import bpy
 
 IGNORED_NODE_TYPES = {"IMAGE", "VIEWER", "GROUP_OUTPUT"}
 
-# The current preset format version, written into every preset saved by this
-# version of the addon.
+# プリセットのバージョン
 PRESET_FORMAT_VERSION = 1
 
-# The minimum preset version this addon version is able to load. Presets
-# older than this will still load, but a warning is shown.
+# プリセットの最小サポートバージョン
 MIN_SUPPORTED_PRESET_VERSION = 1
 
 
@@ -31,7 +29,7 @@ def is_version_supported(preset_version: int, min_version: int = MIN_SUPPORTED_P
         return False
 
 
-# --- Path & Folder Management ---
+# --- パスとフォルダーの管理 ---
 
 
 def get_preset_dir() -> str:
@@ -39,6 +37,7 @@ def get_preset_dir() -> str:
 
     base_dir = os.path.expanduser("~")
 
+    # 設定された保存先を使い、未設定または無効な場合はユーザーホームへ戻します。
     try:
         prefs = bpy.context.preferences.addons.get(addon_name)
         if prefs and hasattr(prefs.preferences, "preset_prefs"):
@@ -76,6 +75,7 @@ def sanitize_preset_name(name: str) -> str:
     if not name:
         return "preset"
 
+    # フォルダー階層は維持しつつ、各要素からパス移動に使える文字を取り除きます。
     parts = []
     for raw_part in str(name).replace("\\", "/").split("/"):
         if not raw_part or raw_part in {".", ".."}:
@@ -113,7 +113,7 @@ def get_subfolders(preset_dir: str) -> list[str]:
     return sorted(entry for entry in os.listdir(preset_dir) if os.path.isdir(os.path.join(preset_dir, entry)))
 
 
-# --- File I/O ---
+# --- ファイル入出力 ---
 
 
 def write_preset_file(path: str, payload: dict) -> None:
@@ -128,6 +128,7 @@ def load_preset_file(path: str) -> dict | None:
         return None
     with open(path, "rb") as handle:
         raw_data = handle.read()
+    # 新形式は圧縮済みですが、旧形式の非圧縮 JSON も読み込めるようにします。
     try:
         json_bytes = zlib.decompress(raw_data)
     except zlib.error:
@@ -138,7 +139,7 @@ def load_preset_file(path: str) -> dict | None:
         return None
 
 
-# --- Serialization & Deserialization ---
+# --- シリアライズとデシリアライズ ---
 
 
 def serialize_value(value):
@@ -148,6 +149,7 @@ def serialize_value(value):
         return [serialize_value(v) for v in value]
     if isinstance(value, dict):
         return {k: serialize_value(v) for k, v in value.items()}
+    # Blender の Vector などは通常の JSON 型ではないため、利用可能な変換 API を順に試します。
     if hasattr(value, "to_list"):
         try:
             return [serialize_value(v) for v in value.to_list()]
@@ -223,6 +225,7 @@ def serialize_node(node: bpy.types.Node) -> dict:
             }
         )
 
+    # 接続関係や読み取り専用値は復元対象ではないため、変更可能な設定だけを保存します。
     for prop in node.bl_rna.properties:
         if prop.identifier in {
             "name",
@@ -262,6 +265,7 @@ def capture_preset(tree: bpy.types.NodeTree | None) -> dict:
     if tree is None:
         return {"version": PRESET_FORMAT_VERSION, "nodes": []}
 
+    # 画像ノードなどは現在のシーンに依存するため、プリセットには含めません。
     return {
         "version": PRESET_FORMAT_VERSION,
         "nodes": [serialize_node(node) for node in tree.nodes if getattr(node, "bl_idname", None) and node.type not in IGNORED_NODE_TYPES],
@@ -287,6 +291,7 @@ def restore_curve_mapping(mapping, data: dict) -> None:
             except Exception:
                 continue
 
+    # 保存時と現在の Blender でカーブ数が異なっても、共通する範囲だけを復元します。
     curves_data = data.get("curves", [])
     curves = getattr(mapping, "curves", None)
     if not curves or not curves_data:
@@ -325,6 +330,7 @@ def restore_curve_mapping(mapping, data: dict) -> None:
 
 
 def restore_node_state(node: bpy.types.Node, node_data: dict) -> None:
+    # ソケット識別子を優先し、形式の異なる古いプリセットにはソケット名で対応します。
     input_lookup = {socket.identifier: socket for socket in node.inputs}
     input_lookup.update({socket.name: socket for socket in node.inputs})
 

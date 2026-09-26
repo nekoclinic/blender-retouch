@@ -1,8 +1,34 @@
 from .compositor import NODETREE_NAME
 
 
+def get_nodes(context, node_names):
+    return [
+        node
+        for name in node_names
+        if (node := get_node_or_input(context, name)) is not None
+    ]
+
+
+def nodes_toggle(layout, context, node_names, inline=False):
+    nodes = get_nodes(context, node_names)
+    if not nodes:
+        return
+
+    icon = "HIDE_OFF" if all(not node.mute for node in nodes) else "HIDE_ON"
+    row = layout if inline else layout.row(align=True)
+    operator = row.operator("retouch.toggle_nodes", text="", icon=icon, emboss=False)
+    operator.node_names = ",".join(node_names)
+
+
+def prop(layout, context, node_name, idx, label, text_prop="default_value"):
+    data = get_node_or_input(context, node_name, idx)
+    if data is not None:
+        layout.prop(data, text_prop, text=label)
+
+
 def get_compositor_tree(context):
     space = context.space_data
+    # ノードエディター編集中のグループを最優先し、通常のシーン参照へフォールバックします。
     if space and space.type == "NODE_EDITOR" and getattr(space, "tree_type", None) == "CompositorNodeTree":
         if getattr(space, "edit_tree", None):
             return space.edit_tree
@@ -21,6 +47,7 @@ def get_compositor_tree(context):
 
 
 def _find_node_recursive(tree, name):
+    # グループ内のノードも検索対象にすることで、テンプレートの内部ノードをパネルから操作できます。
     if not tree:
         return None
     if node := tree.nodes.get(name):
@@ -46,6 +73,7 @@ def get_node_prop_path(context, node, prop):
     try:
         rel = node.path_from_id(prop)
     except (TypeError, AttributeError, ValueError):
+        # 一部のノードでは Blender が相対パスを生成できないため、手動で補います。
         rel = f'nodes["{node.name}"].{prop}'
 
     if getattr(scene, "compositing_node_group", None) == tree:

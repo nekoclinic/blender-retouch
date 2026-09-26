@@ -26,6 +26,7 @@ def _read_marker(marker_path):
     if not os.path.isfile(marker_path):
         return None
 
+    # マーカーは、このアドオンが管理しているテンプレートかを判定するために使います。
     try:
         with open(marker_path, "r") as f:
             lines = f.read().splitlines()
@@ -43,6 +44,7 @@ def _install_atomically(src_blend, dst_blend, marker_path, src_digest):
     dst_existed = os.path.isfile(dst_blend)
     backup_path = dst_blend + ".bak" if dst_existed else None
 
+    # 途中で失敗しても既存テンプレートを壊さないよう、バックアップと一時マーカーを使います。
     if dst_existed:
         shutil.copy(dst_blend, backup_path)
 
@@ -86,6 +88,7 @@ def install_app_template():
         marker = _read_marker(marker_path)
 
         if marker is None:
+            # 手動で配置されたテンプレートは所有権がないため、上書きしません。
             print(f"[{TEMPLATE_NAME}] Existing user startup.blend found at '{template_dir}', leaving it untouched.")
             return True
 
@@ -101,6 +104,7 @@ def install_app_template():
             return False
 
         if installed_digest != current_digest:
+            # インストール後にユーザーが編集した場合も、その変更を保護します。
             print(f"[{TEMPLATE_NAME}] startup.blend at '{template_dir}' was modified by the user, leaving it untouched.")
             return True
 
