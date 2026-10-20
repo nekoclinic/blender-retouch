@@ -1,5 +1,6 @@
 import bpy
-from . import (ui,
+from . import (translations,
+               ui,
                operator,
                scene,
                template,
@@ -7,6 +8,7 @@ from . import (ui,
 
 
 modules = (
+    translations,
     ui,
     operator,
     scene,
@@ -16,6 +18,7 @@ modules = (
 
 
 def register():
+    translations.register()
     for mod in modules:
         mod.register()
 
