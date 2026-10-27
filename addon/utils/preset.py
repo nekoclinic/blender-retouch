@@ -5,10 +5,8 @@ import zlib
 
 import bpy
 
-IGNORED_NODE_TYPES = {"IMAGE", "VIEWER", "GROUP_OUTPUT"}
-
 # プリセットのバージョン
-PRESET_FORMAT_VERSION = 1
+PRESET_FORMAT_VERSION = 2
 
 # プリセットの最小サポートバージョン
 MIN_SUPPORTED_PRESET_VERSION = 1
@@ -261,14 +259,26 @@ def serialize_node(node: bpy.types.Node) -> dict:
     return data
 
 
+def serialize_link(link: bpy.types.NodeLink) -> dict:
+    return {
+        "from_node": link.from_node.name,
+        "from_socket": link.from_socket.identifier,
+        "from_socket_name": link.from_socket.name,
+        "to_node": link.to_node.name,
+        "to_socket": link.to_socket.identifier,
+        "to_socket_name": link.to_socket.name,
+    }
+
+
 def capture_preset(tree: bpy.types.NodeTree | None) -> dict:
     if tree is None:
-        return {"version": PRESET_FORMAT_VERSION, "nodes": []}
+        return {"version": PRESET_FORMAT_VERSION, "nodes": [], "links": []}
 
-    # 画像ノードなどは現在のシーンに依存するため、プリセットには含めません。
+    # ノードの設定だけでなく、追加ノードとノード間の接続も保存します。
     return {
         "version": PRESET_FORMAT_VERSION,
-        "nodes": [serialize_node(node) for node in tree.nodes if getattr(node, "bl_idname", None) and node.type not in IGNORED_NODE_TYPES],
+        "nodes": [serialize_node(node) for node in tree.nodes if getattr(node, "bl_idname", None)],
+        "links": [serialize_link(link) for link in tree.links],
     }
 
 
@@ -356,6 +366,97 @@ def restore_node_state(node: bpy.types.Node, node_data: dict) -> None:
             setattr(node, prop_name, value)
         except Exception:
             continue
+
+
+def restore_preset(tree: bpy.types.NodeTree, payload: dict) -> tuple[int, int, list[str]]:
+    node_lookup = {}
+    errors = []
+    restored_count = 0
+
+    for node_data in payload.get("nodes", []):
+        if not isinstance(node_data, dict):
+            errors.append("Invalid node entry")
+            continue
+
+        node_name = node_data.get("name")
+        node_type = node_data.get("type")
+        if not isinstance(node_name, str) or not isinstance(node_type, str):
+            errors.append(f"Invalid node name or type: {node_data!r}")
+            continue
+
+        node = tree.nodes.get(node_name)
+        if node is None or node.bl_idname != node_type:
+            try:
+                node = tree.nodes.new(type=node_type)
+                node.name = node_name
+            except Exception as e:
+                errors.append(f"Could not create node '{node_name}' ({node_type}): {e}")
+                continue
+
+        if "label" in node_data:
+            node.label = node_data["label"]
+        if "location" in node_data:
+            try:
+                node.location = node_data["location"]
+            except (TypeError, ValueError):
+                errors.append(f"Invalid location for node '{node_name}'")
+
+        restore_node_state(node, node_data)
+        node_lookup[node_name] = node
+        restored_count += 1
+
+    restored_links = 0
+    for link_data in payload.get("links", []):
+        if not isinstance(link_data, dict):
+            errors.append("Invalid link entry")
+            continue
+
+        from_node = node_lookup.get(link_data.get("from_node"))
+        to_node = node_lookup.get(link_data.get("to_node"))
+        if from_node is None or to_node is None:
+            errors.append(
+                f"Could not restore link: node '{link_data.get('from_node')}' "
+                f"or '{link_data.get('to_node')}' is missing"
+            )
+            continue
+
+        def find_socket(sockets, identifier, name):
+            return next(
+                (socket for socket in sockets if socket.identifier == identifier),
+                next((socket for socket in sockets if socket.name == name), None),
+            )
+
+        from_socket = find_socket(
+            from_node.outputs,
+            link_data.get("from_socket"),
+            link_data.get("from_socket_name"),
+        )
+        to_socket = find_socket(
+            to_node.inputs,
+            link_data.get("to_socket"),
+            link_data.get("to_socket_name"),
+        )
+        if from_socket is None or to_socket is None:
+            errors.append(
+                f"Could not restore link between '{from_node.name}' and '{to_node.name}': "
+                "socket not found"
+            )
+            continue
+
+        if any(link.from_socket == from_socket and link.to_socket == to_socket for link in tree.links):
+            restored_links += 1
+            continue
+
+        if not getattr(to_socket, "is_multi_input", False):
+            for existing_link in list(to_socket.links):
+                tree.links.remove(existing_link)
+        try:
+            tree.links.new(from_socket, to_socket)
+            restored_links += 1
+        except Exception as e:
+            errors.append(f"Could not connect '{from_node.name}' to '{to_node.name}': {e}")
+
+    return restored_count, restored_links, errors
 
 
 def get_preset_files(preset_dir: str) -> list[str]:
