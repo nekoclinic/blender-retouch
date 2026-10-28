@@ -23,6 +23,7 @@ _INTERFACE_TRANSLATIONS = {
 
 _OPERATOR_TRANSLATIONS = {
     "Load Image": "画像を読み込む",
+    "Presets": "プリセット",
     "Save Preset": "プリセットを保存",
     "Save the current compositor node values as a preset": "現在のコンポジター設定をプリセットとして保存",
     "Load Preset": "プリセットを読み込む",
