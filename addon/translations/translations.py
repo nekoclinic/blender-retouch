@@ -25,33 +25,39 @@ _OPERATOR_TRANSLATIONS = {
     "Load Image": "画像を読み込む",
     "Presets": "プリセット",
     "Save Preset": "プリセットを保存",
-    "Save the current compositor node values as a preset": "現在のコンポジター設定をプリセットとして保存",
     "Load Preset": "プリセットを読み込む",
-    "Load a saved compositor preset": "保存したコンポジタープリセットを読み込む",
     "Create Folder": "フォルダーを作成",
-    "Create a new preset folder": "新しいプリセットフォルダーを作成",
     "Open Folder": "フォルダーを開く",
-    "Open a preset folder": "プリセットフォルダーを開く",
     "Delete Folder": "フォルダーを削除",
-    "Delete a preset folder and everything inside it": "プリセットフォルダーとその中身を削除",
     "Delete Preset": "プリセットを削除",
-    "Delete a saved compositor preset": "保存したコンポジタープリセットを削除",
     "Rename Preset": "プリセット名を変更",
-    "Rename a saved compositor preset": "保存したコンポジタープリセットの名前を変更",
     "Rename Folder": "フォルダー名を変更",
-    "Rename a preset folder": "プリセットフォルダーの名前を変更",
     "Export Preset": "プリセットを書き出す",
-    "Export a preset .brp file": "プリセットを.brpファイルとして書き出す",
     "Import Preset": "プリセットを読み込む",
-    "Import a preset .brp file": "プリセットの.brpファイルを読み込む",
     "Remove template": "テンプレートを削除",
     "Toggle Nodes": "ノードの有効/無効を切り替え",
+}
+
+_DESCRIPTION_TRANSLATIONS = {
+    "Add nodes": "ノードを追加",
+    "Save the current compositor node setup and values as a preset": "現在のコンポジター設定をプリセットとして保存",
+    "Load a saved compositor preset": "保存したコンポジタープリセットを読み込む",
+    "Create a new preset folder": "新しいプリセットフォルダーを作成",
+    "Open a preset folder": "プリセットフォルダーを開く",
+    "Delete a preset folder and everything inside it": "プリセットフォルダーとその中身を削除",
+    "Delete a saved compositor preset": "保存したコンポジタープリセットを削除",
+    "Rename a saved compositor preset": "保存したコンポジタープリセットの名前を変更",
+    "Rename a preset folder": "プリセットフォルダーの名前を変更",
+    "Export a preset .brp file": "プリセットを.brpファイルとして書き出す",
+    "Import a preset .brp file": "プリセットの.brpファイルを読み込む",
+    "Remove template": "テンプレートを削除",
 }
 
 _TRANSLATIONS = {
     "ja_JP": {
         **{(bpy.app.translations.contexts.default, source): translated for source, translated in _INTERFACE_TRANSLATIONS.items()},
         **{(bpy.app.translations.contexts.operator_default, source): translated for source, translated in _OPERATOR_TRANSLATIONS.items()},
+        **{(bpy.app.translations.contexts.default, source): translated for source, translated in _DESCRIPTION_TRANSLATIONS.items()},
     },
 }
 

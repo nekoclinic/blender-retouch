@@ -18,7 +18,6 @@ modules = (
 
 
 def register():
-    translations.register()
     for mod in modules:
         mod.register()
 
