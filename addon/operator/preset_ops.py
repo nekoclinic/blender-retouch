@@ -13,7 +13,7 @@ from ..utils.preset import (
     get_preset_path,
     write_preset_file,
     load_preset_file,
-    restore_node_state,
+    restore_preset,
     get_preset_dir,
     get_preset_extension,
     is_version_supported,
@@ -25,7 +25,7 @@ from ..utils.preset import (
 class RETOUCH_OT_save_preset(Operator):
     bl_idname = "retouch.save_preset"
     bl_label = "Save Preset"
-    bl_description = "Save the current compositor node values as a preset"
+    bl_description = "Save the current compositor node setup and values as a preset"
 
     preset_name: StringProperty(name="Preset Name", default="")
 
@@ -91,23 +91,16 @@ class RETOUCH_OT_load_preset(Operator):
         elif preset_version is not None and not is_version_supported(preset_version):
             version_warning = f"preset version {preset_version} is older than the minimum supported version {MIN_SUPPORTED_PRESET_VERSION}"
 
-        node_lookup = {node.name: node for node in tree.nodes}
-        restored_count = 0
-        missing_nodes = []
-        for node_data in payload.get("nodes", []):
-            node_name = node_data.get("name")
-            node = node_lookup.get(node_name)
-            if node is None:
-                missing_nodes.append(node_name)
-                continue
-            restore_node_state(node, node_data)
-            restored_count += 1
+        restored_count, restored_links, restore_errors = restore_preset(tree, payload)
 
         messages = []
         if version_warning:
             messages.append(version_warning)
-        if missing_nodes:
-            messages.append(f"{restored_count} nodes restored, {len(missing_nodes)} not found in scene: {', '.join(missing_nodes)}")
+        if restore_errors:
+            messages.append(
+                f"{restored_count} nodes and {restored_links} links restored; "
+                f"{len(restore_errors)} items could not be restored: {'; '.join(restore_errors)}"
+            )
 
         if messages:
             self.report({"WARNING"}, f"Loaded preset: {preset_name} ({'; '.join(messages)})")

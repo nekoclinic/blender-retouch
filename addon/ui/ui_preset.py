@@ -81,7 +81,7 @@ class RETOUCH_PT_preset(RetouchPanelMixin, Panel):
             parent = os.path.dirname(current_folder)
             up_row = col.row()
             up_row.scale_y = 1.1
-            up_op = up_row.operator("retouch.open_preset_folder", text="...", icon="FILE_PARENT", emboss=False)
+            up_op = up_row.operator("retouch.open_preset_folder", text="..", icon="FILE_PARENT", emboss=False)
             up_op.folder_path = parent
             col.separator(factor=0.4)
 
@@ -142,4 +142,3 @@ class RETOUCH_PT_preset(RetouchPanelMixin, Panel):
 classes = (
     RETOUCH_PT_preset,
 )
-
