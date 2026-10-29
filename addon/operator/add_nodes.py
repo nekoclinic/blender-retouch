@@ -13,6 +13,7 @@ from ..utils.compositor import (
     connect_to_outputs,
     apply_retouch_to_scene,
 )
+from ..utils.histogram import request_histogram_update
 
 
 class RETOUCH_OT_add_nodes(Operator, ImportHelper):
@@ -51,6 +52,7 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
 
                 set_scene_resolution(scene, image)
                 connect_to_outputs(node_tree, img_node.outputs["Image"])
+                request_histogram_update()
 
                 self.report({"INFO"}, f"Loaded: {image.name}")
                 return {"FINISHED"}
@@ -69,6 +71,7 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
         scene = apply_retouch_to_scene(self, context, self.filepath, blend_file_path, NODETREE_NAME)
         if scene is None:
             return {"CANCELLED"}
+        request_histogram_update()
         return {"FINISHED"}
 
 

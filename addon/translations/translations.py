@@ -19,11 +19,22 @@ _INTERFACE_TRANSLATIONS = {
     "Rename": "名前を変更",
     "Folder Name": "フォルダー名",
     "Folder Path": "フォルダーのパス",
+    "Histogram": "ヒストグラム",
+    "Show Histogram": "ヒストグラムを表示",
+    "Histogram Width": "ヒストグラムの横幅",
+    "Histogram Opacity": "ヒストグラムの不透明度",
+    "Histogram Resolution": "ヒストグラムの解像度",
 }
 
 _OPERATOR_TRANSLATIONS = {
     "Load Image": "画像を読み込む",
     "Presets": "プリセット",
+    "Toggle Histogram": "ヒストグラム表示切替",
+    "Hide Histogram": "ヒストグラムを隠す",
+    "Show Histogram": "ヒストグラムを表示",
+    "Histogram Width": "ヒストグラムの横幅",
+    "Histogram Opacity": "ヒストグラムの不透明度",
+    "Histogram Resolution": "ヒストグラムの解像度",
     "Save Preset": "プリセットを保存",
     "Load Preset": "プリセットを読み込む",
     "Create Folder": "フォルダーを作成",
@@ -40,6 +51,11 @@ _OPERATOR_TRANSLATIONS = {
 
 _DESCRIPTION_TRANSLATIONS = {
     "Add nodes": "ノードを追加",
+    "Show or hide the histogram overlay": "ヒストグラムのオーバーレイを表示または非表示にする",
+    "Show the histogram overlay in the Image Editor": "画像エディターにヒストグラムのオーバーレイを表示",
+    "Width of the histogram overlay in pixels": "ヒストグラムオーバーレイの幅（ピクセル）",
+    "Opacity of the histogram overlay": "ヒストグラムオーバーレイの不透明度",
+    "Number of histogram samples across the tonal range": "階調範囲のヒストグラム分割数",
     "Save the current compositor node setup and values as a preset": "現在のコンポジター設定をプリセットとして保存",
     "Load a saved compositor preset": "保存したコンポジタープリセットを読み込む",
     "Create a new preset folder": "新しいプリセットフォルダーを作成",
