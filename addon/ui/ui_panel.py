@@ -1,5 +1,6 @@
 from bpy.types import Panel
 
+from ..utils.histogram import is_histogram_visible
 from ..utils.ui import nodes_toggle, get_node_or_input, get_node_prop_path, prop
 
 
