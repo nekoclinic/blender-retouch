@@ -14,6 +14,7 @@ HISTOGRAM_BINS = 128
 MAX_SAMPLE_DIMENSION = 512
 MAX_PIXEL_BUFFER_BYTES = 512 * 1024 * 1024
 MIN_INTERVAL = 1.0 / 30.0
+IDLE_POLL_INTERVAL = 0.25
 LIVE_UPDATE_IDLE = 0.025
 HIST_HEADROOM = 1
 WAVE_COLUMNS = 256
@@ -98,11 +99,13 @@ def update_histogram_mode(self, context) -> None:
 
 
 def update_histogram_visibility(self, context) -> None:
-    global _batches
+    global _batches, _waveforms, _pixel_buffer
     if self.show_histogram_overlay:
         _kick()
     else:
         _batches = None
+        _waveforms = None
+        _pixel_buffer = None
         _tag_image_editors()
 
 
@@ -336,7 +339,7 @@ def _draw_overlay() -> None:
     _ensure_static_batches()
 
     now = time.monotonic()
-    wait = _last_time + MIN_INTERVAL - now
+    wait = _last_time + IDLE_POLL_INTERVAL - now
     if _force or wait <= 0.0:
         _force = False
         _last_time = now
