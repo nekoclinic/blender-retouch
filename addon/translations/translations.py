@@ -58,7 +58,7 @@ _OPERATOR_TRANSLATIONS = {
 _DESCRIPTION_TRANSLATIONS = {
     "Add nodes": "ノードを追加",
     "Show or hide the histogram overlay": "ヒストグラムのオーバーレイを表示または非表示にする",
-    "Show the histogram overlay in the Image Editor": "画像エディターにヒストグラムのオーバーレイを表示",
+    "Show the histogram overlay in the Image Editor when an image is loaded with Blender Retouch": "Blender Retouchで画像を読み込んだときに、画像エディターへヒストグラムのオーバーレイを表示",
     "Display style of the histogram": "ヒストグラムの表示スタイル",
     "Height of the histogram overlay in pixels": "ヒストグラムオーバーレイの高さ（ピクセル）",
     "Width of the histogram overlay in pixels": "ヒストグラムオーバーレイの幅（ピクセル）",
