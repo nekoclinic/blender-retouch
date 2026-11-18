@@ -22,7 +22,7 @@ class BRPreferences(AddonPreferences):
 
     show_histogram_overlay = bpy.props.BoolProperty(
         name="Show Histogram",
-        description="Show the histogram overlay in the Image Editor",
+        description="Show the histogram overlay in the Image Editor when an image is loaded with Blender Retouch",
         default=True,
         update=update_histogram_visibility,
     )

@@ -8,6 +8,7 @@ from bpy.app.handlers import persistent
 from gpu_extras.batch import batch_for_shader
 
 from ... import __package__ as ADDON_MODULE_NAME
+from .ui import is_retouch_loaded
 
 
 HISTOGRAM_BINS = 128
@@ -113,9 +114,13 @@ def request_histogram_update(delay: float = 0.0) -> None:
     _kick()
 
 
-def is_histogram_visible() -> bool:
-    settings = _get_addon_preferences()
-    return getattr(settings, "show_histogram_overlay", _visible)
+def is_histogram_visible(context=None) -> bool:
+    # Blender Retouch で画像を読み込んだシーンでのみヒストグラムを表示します。
+    context = context or bpy.context
+    settings = _get_addon_preferences(context)
+    if not getattr(settings, "show_histogram_overlay", _visible):
+        return False
+    return is_retouch_loaded(context)
 
 
 def toggle_histogram() -> None:
@@ -328,11 +333,13 @@ def _draw_scale_labels_y(font_id, x: float, bottom: float, height: float, opacit
 
 def _draw_overlay() -> None:
     global _force, _last_time, _trailing
-    settings = _get_addon_preferences()
-    if not getattr(settings, "show_histogram_overlay", _visible):
+    context = bpy.context
+    settings = _get_addon_preferences(context)
+    # 読み込んだだけの画像や未適用のシーンではオーバーレイを出しません。
+    if not is_histogram_visible(context):
         return
 
-    region = bpy.context.region
+    region = context.region
     if region is None or region.type != "WINDOW":
         return
 

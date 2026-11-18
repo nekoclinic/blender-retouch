@@ -52,6 +52,8 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
 
                 set_scene_resolution(scene, image)
                 connect_to_outputs(node_tree, img_node.outputs["Image"])
+                # ヒストグラム表示の判定に使うため、このアドオンが用意したツリーだと記録します。
+                node_tree["blender_retouch_loaded"] = True
                 request_histogram_update()
 
                 self.report({"INFO"}, f"Loaded: {image.name}")

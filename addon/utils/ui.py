@@ -97,3 +97,18 @@ def is_retouch_group_applied(context):
         return False
 
     return is_retouch(tree.name) or any(is_retouch(n.node_tree.name) for n in tree.nodes if n.type == "GROUP" and n.node_tree)
+
+
+def is_retouch_loaded(context) -> bool:
+    """Blender Retouch で画像を読み込んだシーンかどうかを返します。"""
+    # 通常モードはテンプレートのグループが適用されているかで判定できます。
+    if is_retouch_group_applied(context):
+        return True
+
+    # 「画像のみ」モードではテンプレートを使わないため、ツリーの目印で判定します。
+    if not (tree := get_compositor_tree(context)):
+        return False
+    try:
+        return bool(tree["blender_retouch_loaded"])
+    except (KeyError, TypeError):
+        return False
