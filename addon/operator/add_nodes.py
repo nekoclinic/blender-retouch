@@ -46,14 +46,14 @@ class RETOUCH_OT_add_nodes(Operator, ImportHelper):
                 image = bpy.data.images.load(self.filepath, check_existing=True)
                 scene = context.scene
                 node_tree = create_compositor_nodes(scene)
-                # ヒストグラム表示の判定に使うため、このアドオンが用意したツリーだと記録します。
-                node_tree["blender_retouch_loaded"] = True
 
                 img_node = find_or_create_image_node(node_tree, image.name)
                 img_node.image = image
 
                 set_scene_resolution(scene, image)
                 connect_to_outputs(node_tree, img_node.outputs["Image"])
+                # ヒストグラム表示の判定に使うため、このアドオンが用意したツリーだと記録します。
+                node_tree["blender_retouch_loaded"] = True
                 request_histogram_update()
 
                 self.report({"INFO"}, f"Loaded: {image.name}")
